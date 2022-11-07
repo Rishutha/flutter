@@ -1,0 +1,59 @@
+def mobile = new Properties()
+def mobileFile = rootProject.file('local.properties')
+if (mobileFile.exists()) {
+    mobileFile.withReader('UTF-8') { reader ->
+        mobile.load(reader)
+    }
+}
+
+def flutter = mobile.getProperty('flutter.sdk')
+if (flutter == null) {
+    throw new GradleException("Flutter SDK not found. Define location with flutter.sdk in the local.properties file.")
+}
+
+def FVcode = mobile.getProperty('flutter.Vcode')
+if (FVcode == null) {
+    FVcode = '1'
+}
+
+def FVname = mobile.getProperty('flutter.versionName')
+if (FVname == null) {
+    FVname = '1.0'
+}
+
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply from: "$flutter/packages/flutter_tools/gradle/flutter.gradle"
+
+android {
+    compileSdkVersion 30
+
+    sourceSets {
+        main.java.srcDirs += 'src/main/kotlin'
+    }
+
+    defaultConfig {
+        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
+        applicationId "com.example.example"
+        minSdkVersion 16
+        targetSdkVersion 30
+        Vcode FVcode.toInteger()
+        versionName FVname
+    }
+
+    buildTypes {
+        release {
+            // TODO: Add your own signing config for the release build.
+            // Signing with the debug keys for now, so `flutter run --release` works.
+            signingConfig signingConfigs.debug
+        }
+    }
+}
+
+flutter {
+    source '../..'
+}
+
+dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+}
